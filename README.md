@@ -1,2 +1,2 @@
-# Advanced-Doctor-Appointment-Management-System-PHP-MySQL-
-A full-stack Doctor Appointment Booking System with Admin Panel, Review System, Availability Management, and Advanced Glass UI Design.
+# 🏥 Advanced Doctor Appointment Management System
+A modern, scalable, and feature-rich Doctor Appointment Booking System built with PHP and MySQL.
