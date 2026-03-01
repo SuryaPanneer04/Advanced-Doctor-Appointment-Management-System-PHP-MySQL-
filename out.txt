@@ -1,0 +1,10 @@
+Array
+(
+    [0] => Array
+        (
+            [id] => 1
+            [username] => admin
+            [password] => $2y$10$SV2FtMn7MIAT/pMn18xzDeCEH1D5RFUg.A8TPKYjS3JoIMmfjwhme
+        )
+
+)
