@@ -1,7 +1,9 @@
 <?php
 // includes/header.php
 @session_start();
-$base_url = '/doctor-management'; // Change as necessary based on your server structure.
+$doc_root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])), '/');
+$proj_root = rtrim(str_replace('\\', '/', realpath(dirname(__DIR__))), '/');
+$base_url = str_replace($doc_root, '', $proj_root);
 
 // Determine if we are in admin or user area based on URL
 $current_uri = $_SERVER['REQUEST_URI'];
