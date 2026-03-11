@@ -49,6 +49,7 @@ CREATE TABLE `doctors` (
   `phone` varchar(20) NOT NULL,
   `photo` varchar(255) DEFAULT NULL,
   `details` text DEFAULT NULL,
+  `rating` decimal(3,1) NOT NULL DEFAULT 0.0,
   `is_available` boolean NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE CASCADE

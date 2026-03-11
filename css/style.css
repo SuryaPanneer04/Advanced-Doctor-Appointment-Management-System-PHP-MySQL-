@@ -215,6 +215,41 @@ a:hover {
     overflow-x: auto;
 }
 
+/* Scroll Optimization for Admin Panels */
+.admin-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #1e293b !important; /* Solid dark blue for visibility */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.admin-search-box {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.admin-search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+}
+
+.admin-search-input {
+    padding-left: 2.8rem !important;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -798,8 +833,23 @@ body.global-glass-body .footer p {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.top-rated-glow {
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15), inset 0 0 10px rgba(251, 191, 36, 0.05) !important;
+    animation: goldGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes goldGlow {
+    from {
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.1), inset 0 0 5px rgba(251, 191, 36, 0.02);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.25), inset 0 0 15px rgba(251, 191, 36, 0.08);
+    }
 }
 
 .global-glass-card:hover,

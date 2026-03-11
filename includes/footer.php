@@ -2,7 +2,7 @@
 
 <footer class="footer">
     <div class="container text-center">
-        <p>&copy; <?php echo date("Y"); ?> MedCare System. All rights reserved.</p>
+        <p>&copy; <?php echo date("Y"); ?> HealthyHub System. All rights reserved.</p>
     </div>
 </footer>
 

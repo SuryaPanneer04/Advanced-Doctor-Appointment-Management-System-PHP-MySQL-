@@ -25,7 +25,7 @@ $topReviews = $reviewsStmt->fetchAll();
     <div class="hero-overlay"></div>
     
     <div class="hero-content fade-in-up">
-        <h1>Welcome to MedCare</h1>
+        <h1>Welcome to HealthyHub</h1>
         <p>Your trusted partner for world-class healthcare, connecting you with top-rated specialists anytime, anywhere.</p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <?php if(!isset($_SESSION['user_id'])): ?>
@@ -81,13 +81,13 @@ $topReviews = $reviewsStmt->fetchAll();
     <div class="card fade-in-up" style="margin-bottom: 5rem; padding: 0; overflow: hidden;">
         <div style="display: flex; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 300px;">
-                <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="About MedCare" style="width: 100%; height: 100%; object-fit: cover; min-height: 400px;">
+                <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="About HealthyHub" style="width: 100%; height: 100%; object-fit: cover; min-height: 400px;">
             </div>
             <div style="flex: 1; min-width: 300px; padding: 4rem;">
                 <h2 class="section-title" style="color: var(--dark) !important;">About Us</h2>
                 <h4 style="color: var(--primary); margin-bottom: 1.5rem; font-size: 1.2rem;">Empowering Your Health Journey</h4>
                 <p style="color: var(--gray) !important; line-height: 1.8; margin-bottom: 1.5rem;">
-                    MedCare is a leading digital healthcare platform designed to bridge the gap between world-class medical specialists and patients in need. We leverage technology to provide seamless appointment scheduling, transparent reviews, and secure management.
+                    HealthyHub is a leading digital healthcare platform designed to bridge the gap between world-class medical specialists and patients in need. We leverage technology to provide seamless appointment scheduling, transparent reviews, and secure management.
                 </p>
                 <p style="color: var(--gray) !important; line-height: 1.8; margin-bottom: 2rem;">
                     Whether you need a routine checkup or specialized care, our curated network of doctors is available at your fingertips.
@@ -97,7 +97,7 @@ $topReviews = $reviewsStmt->fetchAll();
         </div>
     </div>
 
-    <!-- MedCare Reviews -->
+    <!-- HealthyHub Reviews -->
     <?php if(count($topReviews) > 0): ?>
     <div style="margin-bottom: 5rem;">
         <div class="text-center fade-in-up" style="margin-bottom: 3rem;">
@@ -164,13 +164,13 @@ $topReviews = $reviewsStmt->fetchAll();
                         <div class="icon-box" style="margin-bottom: 0; flex-shrink: 0; background: rgba(255,255,255,0.2); color: white;"><i class="fa-solid fa-envelope"></i></div>
                         <div>
                             <strong>Email Inquiries</strong><br>
-                            <a href="mailto:support@medcare-health.com" style="opacity: 0.9; text-decoration: none; color: white;">support@medcare-health.com</a>
+                            <a href="mailto:support@healthyhub-health.com" style="opacity: 0.9; text-decoration: none; color: white;">support@healthyhub-health.com</a>
                         </div>
                     </li>
                 </ul>
-                <a href="#" class="btn btn-glass" onclick="event.preventDefault(); Swal.fire('Live Chat', 'Connecting you to our support team...', 'info');">
+                <!-- <a href="#" class="btn btn-glass" onclick="event.preventDefault(); Swal.fire('Live Chat', 'Connecting you to our support team...', 'info');">
                     <i class="fa-solid fa-comments"></i> Start Live Chat
-                </a>
+                </a> -->
             </div>
         </div>
     </div>

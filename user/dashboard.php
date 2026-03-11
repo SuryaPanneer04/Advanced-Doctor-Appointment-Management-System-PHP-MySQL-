@@ -119,7 +119,7 @@ $categories = $categoriesStmt->fetchAll();
 
 <!-- Pro UI: About & Contact Sections -->
 <div class="fade-in-up delay-200" style="margin-top: 2rem;">
-    <h2 class="section-title" style="color: white;">Discover MedCare</h2>
+    <h2 class="section-title" style="color: white;">Discover HealthyHub</h2>
     
     <div class="pro-grid">
         <!-- About Section -->
@@ -130,7 +130,7 @@ $categories = $categoriesStmt->fetchAll();
             </div>
             <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: white;">About Our Platform</h3>
             <p style="color: rgba(255,255,255,0.9); line-height: 1.8; margin-bottom: 1.5rem; font-size: 1rem;">
-                MedCare is an advanced, globally recognized digital healthcare ecosystem designed to bridge the gap between world-class medical specialists and patients in need. 
+                HealthyHub is an advanced, globally recognized digital healthcare ecosystem designed to bridge the gap between world-class medical specialists and patients in need. 
                 We leverage state-of-the-art technology to provide seamless appointment scheduling, transparent verified reviews, and secure patient data management.
             </p>
             <p style="color: rgba(255,255,255,0.9); line-height: 1.8; font-size: 1rem;">
@@ -151,7 +151,7 @@ $categories = $categoriesStmt->fetchAll();
             <ul class="contact-list" style="color: white;">
                 <li>
                     <i class="fa-solid fa-globe"></i>
-                    <a href="https://www.medcare-health.example.com" target="_blank" style="color: white;">www.medcare-health.com</a>
+                    <a href="https://www.healthyhub-health.example.com" target="_blank" style="color: white;">www.healthyhub-health.com</a>
                 </li>
                 <li>
                     <i class="fa-solid fa-phone"></i>
@@ -159,7 +159,7 @@ $categories = $categoriesStmt->fetchAll();
                 </li>
                 <li>
                     <i class="fa-solid fa-envelope"></i>
-                    <a href="mailto:support@medcare-health.com" style="color: white;">support@medcare-health.com</a>
+                    <a href="mailto:support@healthyhub-health.com" style="color: white;">support@healthyhub-health.com</a>
                 </li>
                 <li>
                     <i class="fa-solid fa-location-dot"></i>

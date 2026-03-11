@@ -19,10 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $details = trim($_POST['details']);
     $is_available = isset($_POST['is_available']) ? (int)$_POST['is_available'] : 1;
     $category_id = (int)$_POST['category_id'];
+    $rating = (float)$_POST['rating'];
 
     if (!empty($name) && !empty($email) && !empty($phone) && $category_id > 0) {
-        $stmt = $pdo->prepare("INSERT INTO doctors (category_id, name, email, phone, photo, details, is_available) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt->execute([$category_id, $name, $email, $phone, $photo, $details, $is_available])) {
+        $stmt = $pdo->prepare("INSERT INTO doctors (category_id, name, email, phone, photo, details, rating, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt->execute([$category_id, $name, $email, $phone, $photo, $details, $rating, $is_available])) {
             $success = "Doctor added successfully.";
         } else {
             $error = "Failed to add doctor.";
@@ -114,6 +115,11 @@ $doctors = $pdo->query("
                 <textarea name="details" id="details" class="form-control glass-input" rows="3" placeholder="Short biography..."></textarea>
             </div>
             
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label" for="rating" style="color: rgba(255,255,255,0.9);">Star Rating (1.0 - 5.0)</label>
+                <input type="number" name="rating" id="rating" class="form-control glass-input" step="0.1" min="1" max="5" value="5.0" required>
+            </div>
+            
             <div class="form-group" style="margin-bottom: 2rem;">
                 <label class="form-label" for="is_available" style="color: rgba(255,255,255,0.9);">Status</label>
                 <select name="is_available" id="is_available" class="form-control glass-input">
@@ -128,15 +134,21 @@ $doctors = $pdo->query("
 </div>
 
 <div class="global-glass-container fade-in-up delay-200">
-    <div class="table-responsive">
-        <table>
-            <thead>
+    <div class="admin-search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="doctorSearch" class="form-control glass-input admin-search-input" placeholder="Search doctors by name, email, or specialization...">
+    </div>
+
+    <div class="table-responsive admin-table-container">
+        <table id="doctorsTable">
+            <thead class="sticky-header">
                 <tr>
                     <th>Photo</th>
                     <th>Name</th>
                     <th>Specialization</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Rating</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -162,6 +174,16 @@ $doctors = $pdo->query("
                             <td><?php echo htmlspecialchars($doc['email']); ?></td>
                             <td><?php echo htmlspecialchars($doc['phone']); ?></td>
                             <td>
+                                <div class="review-stars" style="margin: 0; font-size: 0.8rem;">
+                                    <?php 
+                                    for($i=1; $i<=5; $i++) {
+                                        echo ($i <= round($doc['rating'])) ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                                    }
+                                    ?>
+                                    <span style="margin-left: 0.3rem;"><?php echo number_format($doc['rating'], 1); ?></span>
+                                </div>
+                            </td>
+                            <td>
                                 <?php if($doc['is_available'] == 1): ?>
                                     <span class="glass-badge" style="background: rgba(5, 150, 105, 0.4); border-color: rgba(5, 150, 105, 0.5); cursor: pointer;" onclick="toggleAvailability(<?php echo $doc['id']; ?>, 0)" title="Click to mark as Not Available">Available</span>
                                 <?php else: ?>
@@ -186,6 +208,16 @@ $doctors = $pdo->query("
 </div>
 
 <script>
+document.getElementById('doctorSearch').addEventListener('keyup', function() {
+    const term = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#doctorsTable tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+});
+
 async function toggleAvailability(doctorId, newStatus) {
     try {
         const formData = new FormData();

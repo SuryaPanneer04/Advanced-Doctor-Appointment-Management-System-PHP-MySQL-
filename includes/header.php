@@ -37,7 +37,7 @@ $is_user = strpos($current_uri, '/user/') !== false;
 <nav class="navbar">
     <div class="container nav-container">
         <a href="<?php echo $base_url; ?>/index.php" class="brand">
-            <i class="fa-solid fa-stethoscope"></i> MedCare
+            <i class="fa-solid fa-stethoscope"></i> HealthyHub
         </a>
         
         <div class="nav-links">
@@ -62,6 +62,7 @@ $is_user = strpos($current_uri, '/user/') !== false;
                 <!-- User Area or Main Area -->
                 <a href="<?php echo $base_url; ?>/index.php">Home</a>
                 <a href="<?php echo $base_url; ?>/user/doctors-directory.php">Explore Doctors</a>
+                <a href="<?php echo $base_url; ?>/user/doctors-by-category.php">By Category</a>
                 <?php if(isset($_SESSION['user_id'])): ?>
                     <a href="<?php echo $base_url; ?>/user/dashboard.php">My Appointments</a>
                     <a href="<?php echo $base_url; ?>/user/book-appointment.php" class="btn btn-primary">Book Now</a>

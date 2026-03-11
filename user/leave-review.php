@@ -43,6 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($rating >= 1 && $rating <= 5) {
         $stmt = $pdo->prepare("INSERT INTO reviews (appointment_id, user_id, doctor_id, rating, comment) VALUES (?, ?, ?, ?, ?)");
         if ($stmt->execute([$appointment_id, $user_id, $appointment['doctor_id'], $rating, $comment])) {
+            // Update doctor's overall rating (dynamic average logic)
+            $calcStmt = $pdo->prepare("SELECT AVG(rating) as new_avg FROM reviews WHERE doctor_id = ?");
+            $calcStmt->execute([$appointment['doctor_id']]);
+            $newAvg = (float)$calcStmt->fetchColumn();
+            
+            // Round to 1 decimal place or keep high precision if preferred
+            $updateStmt = $pdo->prepare("UPDATE doctors SET rating = ? WHERE id = ?");
+            $updateStmt->execute([number_format($newAvg, 1, '.', ''), $appointment['doctor_id']]);
+
             $success = "Review submitted successfully!";
         } else {
             $error = "Failed to submit review.";
@@ -55,11 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include '../includes/header.php';
 ?>
 
-<div class="card" style="max-width: 600px; margin: 0 auto; margin-top: 2rem;">
-    <h2 class="card-title">Leave a Review</h2>
-    <p>Doctor: <strong><?php echo htmlspecialchars($appointment['doctor_name']); ?></strong></p>
-    <p>Date: <?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></p>
-    <hr style="margin: 1rem 0;">
+<div class="global-glass-container fade-in-up" style="max-width: 600px; margin: 0 auto; margin-top: 2rem;">
+    <h2 style="color: white; margin-bottom: 1.5rem;">Leave a Review</h2>
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;">
+        <p style="margin-bottom: 0.5rem;">Doctor: <strong style="color: white;"><?php echo htmlspecialchars($appointment['doctor_name']); ?></strong></p>
+        <p>Date: <span style="color: rgba(255,255,255,0.8);"><?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></span></p>
+    </div>
 
     <?php if ($success): ?>
         <script>
@@ -82,9 +92,9 @@ include '../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="">
-        <div class="form-group">
-            <label class="form-label">Rating (1 to 5 Stars)</label>
-            <div style="display: flex; gap: 0.5rem; font-size: 1.5rem; color: #fbbf24; cursor: pointer;" id="star-rating">
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label class="form-label" style="color: rgba(255,255,255,0.9); margin-bottom: 1rem; display: block;">Rating (1 to 5 Stars)</label>
+            <div style="display: flex; gap: 0.8rem; font-size: 2rem; color: #fbbf24; cursor: pointer;" id="star-rating">
                 <i class="fa-regular fa-star" data-value="1"></i>
                 <i class="fa-regular fa-star" data-value="2"></i>
                 <i class="fa-regular fa-star" data-value="3"></i>
@@ -94,12 +104,12 @@ include '../includes/header.php';
             <input type="hidden" name="rating" id="rating-input" required>
         </div>
 
-        <div class="form-group">
-            <label class="form-label" for="comment">Comment</label>
-            <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="Share your experience... (optional)"></textarea>
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label class="form-label" for="comment" style="color: rgba(255,255,255,0.9);">Your Comments</label>
+            <textarea name="comment" id="comment" class="form-control glass-input" rows="4" placeholder="Share your experience with HealthyHub specialists..."></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Submit Review</button>
+        <button type="submit" class="glass-btn" style="width: 100%;"><i class="fa-solid fa-paper-plane"></i> Submit Review</button>
     </form>
 </div>
 

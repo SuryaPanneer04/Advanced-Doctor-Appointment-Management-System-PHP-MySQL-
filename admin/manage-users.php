@@ -19,9 +19,15 @@ $users = $pdo->query("SELECT * FROM users ORDER BY created_at DESC")->fetchAll()
 
 <div class="global-glass-container fade-in-up delay-100">
     <p style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.8);">View only access to all the registered patients in the system.</p>
-    <div class="table-responsive">
-        <table>
-            <thead>
+    
+    <div class="admin-search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="userSearch" class="form-control glass-input admin-search-input" placeholder="Search patients by name or email...">
+    </div>
+
+    <div class="table-responsive admin-table-container">
+        <table id="usersTable">
+            <thead class="sticky-header">
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
@@ -50,5 +56,17 @@ $users = $pdo->query("SELECT * FROM users ORDER BY created_at DESC")->fetchAll()
         </table>
     </div>
 </div>
+
+<script>
+document.getElementById('userSearch').addEventListener('keyup', function() {
+    const term = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#usersTable tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>

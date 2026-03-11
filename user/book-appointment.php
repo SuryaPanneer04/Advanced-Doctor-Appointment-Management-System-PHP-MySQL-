@@ -225,34 +225,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (doctors.length > 0) {
                     doctors.forEach(doc => {
                         let starsHtml = '';
-                        const rating = parseFloat(doc.avg_rating);
+                        const rating = parseFloat(doc.rating);
+                        const isHighRated = (rating >= 4.5);
+                        const starColor = isHighRated ? '#fbbf24' : 'rgba(255,255,255,0.6)';
+
                         for(let i=1; i<=5; i++) {
-                            if (i <= Math.round(rating)) {
-                                starsHtml += '<i class="fa-solid fa-star"></i>';
+                            if (i <= Math.floor(rating)) {
+                                starsHtml += `<i class="fa-solid fa-star" style="color: ${starColor};"></i>`;
+                            } else if (i - 0.5 <= rating) {
+                                starsHtml += `<i class="fa-solid fa-star-half-stroke" style="color: ${starColor};"></i>`;
                             } else {
-                                starsHtml += '<i class="fa-regular fa-star"></i>';
+                                starsHtml += `<i class="fa-regular fa-star" style="color: ${starColor};"></i>`;
                             }
                         }
 
                         const isAvail = (doc.is_available == 1 || doc.is_available == '1');
+                        const isTopTier = (rating >= 4.8);
                         
                         const cardHTML = `
-                            <div class="doctor-card ${!isAvail ? 'unavailable' : ''}" data-id="${doc.id}">
+                            <div class="doctor-card ${!isAvail ? 'unavailable' : ''} ${isHighRated ? 'top-rated-glow' : ''}" data-id="${doc.id}" style="position: relative; ${isHighRated ? 'border: 1px solid rgba(251, 191, 36, 0.4); box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);' : ''}">
+                                ${isTopTier ? '<span class="glass-badge" style="position:absolute; top:-10px; right:-10px; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000; font-weight: 700; border: none; font-size: 0.7rem; padding: 0.2rem 0.5rem;"><i class="fa-solid fa-crown"></i> TOP</span>' : ''}
                                 <div style="display: flex; gap: 1rem; align-items: start;">
-                                    <img src="${doc.photo ? doc.photo : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(doc.name) + '&background=random'}" alt="${doc.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                                    <img src="${doc.photo ? doc.photo : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(doc.name) + '&background=random'}" alt="${doc.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid ${isHighRated ? 'rgba(251, 191, 36, 0.5)' : 'rgba(255,255,255,0.3)'};">
                                     <div>
                                         <h4 style="margin: 0; color: white;">${doc.name}</h4>
-                                        <div style="margin-top: 0.2rem;">
+                                        <div style="margin-top: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
                                             <span class="stars">${starsHtml}</span>
-                                            <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-left: 0.5rem;">
-                                                ${doc.avg_rating} (${doc.review_count} reviews)
+                                            <span style="font-size: 0.85rem; color: white; font-weight: 600;">
+                                                ${rating.toFixed(1)}
                                             </span>
+                                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">( ${doc.review_count} Reviews )</span>
                                         </div>
                                         <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.8);">${doc.details ? doc.details : 'No details provided.'}</p>
                                     </div>
                                 </div>
                                 <div style="display: flex; flex-direction: column; justify-content: center; gap: 0.5rem;">
-                                    ${!isAvail ? '<span class="glass-badge" style="background: rgba(220, 38, 38, 0.4); border-color: rgba(220, 38, 38, 0.5); text-align: center;">Not Available</span>' : '<span class="glass-badge" style="background: rgba(5, 150, 105, 0.4); border-color: rgba(5, 150, 105, 0.5); text-align: center;">Available</span>'}
+                                    ${!isAvail ? '<span class="glass-badge" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; text-align: center;">Booked</span>' : '<span class="glass-badge" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; text-align: center;">Available</span>'}
                                     <button type="button" class="glass-btn view-reviews-btn" data-id="${doc.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; background: transparent; border: 1px solid rgba(255,255,255,0.3); box-shadow: none;" ${doc.review_count == 0 ? 'disabled' : ''}>Reviews</button>
                                 </div>
                             </div>

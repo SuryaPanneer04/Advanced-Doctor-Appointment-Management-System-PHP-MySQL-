@@ -27,23 +27,23 @@ if (count($whereClauses) > 0) {
     $whereSQL = "WHERE " . implode(" AND ", $whereClauses);
 }
 
-$orderBySQL = "ORDER BY avg_rating DESC, d.name ASC";
+$orderBySQL = "ORDER BY d.rating DESC, d.name ASC";
 if ($sort === 'reviews') {
-    $orderBySQL = "ORDER BY review_count DESC, avg_rating DESC";
+    $orderBySQL = "ORDER BY review_count DESC, d.rating DESC";
 } elseif ($sort === 'recent') {
     $orderBySQL = "ORDER BY d.id DESC"; // Assuming highest ID is most recently added
 }
 
 // Fetch doctors
 $sql = "
-    SELECT d.id, d.name, d.photo, d.details, d.is_available, d.category_id, c.name as category_name,
+    SELECT d.id, d.name, d.photo, d.details, d.is_available, d.category_id, d.rating, c.name as category_name,
            COALESCE(AVG(r.rating), 0) as avg_rating, 
            COUNT(r.id) as review_count 
     FROM doctors d 
     LEFT JOIN categories c ON d.category_id = c.id
     LEFT JOIN reviews r ON d.id = r.doctor_id 
     $whereSQL
-    GROUP BY d.id, d.name, d.photo, d.details, d.is_available, d.category_id, c.name
+    GROUP BY d.id, d.name, d.photo, d.details, d.is_available, d.category_id, d.rating, c.name
     $orderBySQL
 ";
 
