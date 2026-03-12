@@ -9,6 +9,7 @@ $base_url = str_replace($doc_root, '', $proj_root);
 $current_uri = $_SERVER['REQUEST_URI'];
 $is_admin = strpos($current_uri, '/admin/') !== false;
 $is_user = strpos($current_uri, '/user/') !== false;
+$is_doctor = strpos($current_uri, '/doctor/') !== false;
 
 ?>
 <!DOCTYPE html>
@@ -58,11 +59,25 @@ $is_user = strpos($current_uri, '/user/') !== false;
                 <?php else: ?>
                     <a href="<?php echo $base_url; ?>/admin/login.php" class="btn btn-primary">Admin Login</a>
                 <?php endif; ?>
+            <?php elseif ($is_doctor): ?>
+                <?php if(isset($_SESSION['doctor_id'])): ?>
+                    <div class="nav-links">
+                        <a href="<?php echo $base_url; ?>/doctor/dashboard.php">My Appointments</a>
+                        <a href="<?php echo $base_url; ?>/doctor/profile.php">My Profile</a>
+                    </div>
+                    <div class="user-menu">
+                        <span style="font-weight: 500; color: #6ee7b7;"><i class="fa-solid fa-user-md"></i> <?php echo htmlspecialchars($_SESSION['doctor_name']); ?></span>
+                        <a href="<?php echo $base_url; ?>/doctor/logout.php" class="btn btn-danger" style="padding: 0.4rem 1rem;">Logout</a>
+                    </div>
+                <?php else: ?>
+                    <a href="<?php echo $base_url; ?>/doctor/login.php" class="btn btn-primary">Doctor Login</a>
+                <?php endif; ?>
             <?php else: ?>
                 <!-- User Area or Main Area -->
                 <a href="<?php echo $base_url; ?>/index.php">Home</a>
                 <a href="<?php echo $base_url; ?>/user/doctors-directory.php">Explore Doctors</a>
                 <a href="<?php echo $base_url; ?>/user/doctors-by-category.php">By Category</a>
+                <a href="<?php echo $base_url; ?>/doctor/login.php" style="color: #6ee7b7;">Doctor Portal</a>
                 <?php if(isset($_SESSION['user_id'])): ?>
                     <a href="<?php echo $base_url; ?>/user/dashboard.php">My Appointments</a>
                     <a href="<?php echo $base_url; ?>/user/book-appointment.php" class="btn btn-primary">Book Now</a>

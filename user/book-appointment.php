@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $doctor_id = (int)$_POST['doctor_id'];
     $date = trim($_POST['appointment_date']);
     $time = trim($_POST['appointment_time']);
+    $patient_query = trim($_POST['patient_query']);
     $user_id = $_SESSION['user_id'];
 
     if ($category_id > 0 && $doctor_id > 0 && !empty($date) && !empty($time)) {
@@ -23,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($datetime < time()) {
             $error = "You cannot book an appointment in the past.";
         } else {
-            $stmt = $pdo->prepare("INSERT INTO appointments (user_id, doctor_id, appointment_date, appointment_time, status) VALUES (?, ?, ?, ?, 'Pending')");
-            if ($stmt->execute([$user_id, $doctor_id, $date, $time])) {
-                $success = "Appointment request sent successfully! Waiting for admin approval.";
+            $stmt = $pdo->prepare("INSERT INTO appointments (user_id, doctor_id, appointment_date, appointment_time, patient_query, status) VALUES (?, ?, ?, ?, ?, 'Pending')");
+            if ($stmt->execute([$user_id, $doctor_id, $date, $time, $patient_query])) {
+                $success = "Appointment request sent successfully! Waiting for doctor approval.";
             } else {
                 $error = "Failed to book appointment.";
             }
@@ -121,6 +122,11 @@ $initial_doctor_id = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : 0;
                 <label class="form-label" for="appointment_time" style="color: rgba(255,255,255,0.9);">Time</label>
                 <input type="time" name="appointment_time" id="appointment_time" class="form-control glass-input" required>
             </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" for="patient_query" style="color: rgba(255,255,255,0.9);">Symptoms / Your Query</label>
+            <textarea name="patient_query" id="patient_query" class="form-control glass-input" rows="3" placeholder="Describe your symptoms or reason for appointment..." required></textarea>
         </div>
         
         <button type="submit" class="glass-btn" style="width: 100%; margin-top: 1rem;"><i class="fa-solid fa-calendar-check"></i> Submit Request</button>

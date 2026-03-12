@@ -66,9 +66,27 @@ include '../includes/header.php';
 
 <div class="global-glass-container fade-in-up" style="max-width: 600px; margin: 0 auto; margin-top: 2rem;">
     <h2 style="color: white; margin-bottom: 1.5rem;">Leave a Review</h2>
+    
     <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;">
-        <p style="margin-bottom: 0.5rem;">Doctor: <strong style="color: white;"><?php echo htmlspecialchars($appointment['doctor_name']); ?></strong></p>
-        <p>Date: <span style="color: rgba(255,255,255,0.8);"><?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></span></p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <p style="margin-bottom: 0.2rem; color: rgba(255,255,255,0.6); font-size: 0.85rem;">Treating Doctor</p>
+                <strong style="color: white; font-size: 1.1rem;"><i class="fa-solid fa-user-md"></i> <?php echo htmlspecialchars($appointment['doctor_name']); ?></strong>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin-bottom: 0.2rem; color: rgba(255,255,255,0.6); font-size: 0.85rem;">Date</p>
+                <span style="color: white; font-weight: 500;"><?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></span>
+            </div>
+        </div>
+        
+        <?php if (!empty($appointment['doctor_report'])): ?>
+            <div style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(110, 231, 183, 0.1); border-left: 4px solid #6ee7b7; border-radius: 4px;">
+                <h4 style="color: #6ee7b7; margin-bottom: 0.5rem; font-size: 0.95rem;"><i class="fa-solid fa-file-medical"></i> DOCTOR'S CHECKUP SCENARIO:</h4>
+                <p style="color: white; margin: 0; font-style: italic; line-height: 1.6;">
+                    "<?php echo nl2br(htmlspecialchars($appointment['doctor_report'])); ?>"
+                </p>
+            </div>
+        <?php endif; ?>
     </div>
 
     <?php if ($success): ?>

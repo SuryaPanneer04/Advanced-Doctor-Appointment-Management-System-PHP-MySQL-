@@ -73,15 +73,26 @@ $categories = $categoriesStmt->fetchAll();
                                 </span>
                             </td>
                             <td>
-                                <?php if ($appt['status'] === 'Approved'): ?>
-                                    <?php if ($appt['has_review'] > 0): ?>
-                                        <span class="text-gray" style="font-size: 0.9rem;"><i class="fa-solid fa-check"></i> Reviewed</span>
-                                    <?php else: ?>
-                                        <a href="leave-review.php?appointment_id=<?php echo $appt['id']; ?>" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Leave Review</a>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                                    <?php if (!empty($appt['doctor_report'])): ?>
+                                        <button class="glass-btn" style="background: rgba(79, 70, 229, 0.2); border-color: rgba(79, 70, 229, 0.4); color: white; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;" 
+                                                onclick="showReport('<?php echo addslashes(htmlspecialchars($appt['doctor_name'])); ?>', '<?php echo addslashes(htmlspecialchars($appt['doctor_report'])); ?>')">
+                                            <i class="fa-solid fa-file-medical"></i> View Report
+                                        </button>
                                     <?php endif; ?>
-                                <?php else: ?>
-                                    <span class="text-gray">-</span>
-                                <?php endif; ?>
+
+                                    <?php if ($appt['status'] === 'Approved'): ?>
+                                        <?php if ($appt['has_review'] > 0): ?>
+                                            <span class="text-gray" style="font-size: 0.9rem;"><i class="fa-solid fa-check"></i> Reviewed</span>
+                                        <?php else: ?>
+                                            <a href="leave-review.php?appointment_id=<?php echo $appt['id']; ?>" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Leave Review</a>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (empty($appt['doctor_report']) && $appt['status'] !== 'Approved'): ?>
+                                        <span class="text-gray">-</span>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -167,9 +178,9 @@ $categories = $categoriesStmt->fetchAll();
                 </li>
             </ul>
 
-            <a href="#" class="btn-glass" style="border-color: rgba(255,255,255,0.3);" onclick="event.preventDefault(); Swal.fire('Live Chat', 'Our live chat system is currently connecting you to an agent...', 'info');">
+            <!-- <a href="#" class="btn-glass" style="border-color: rgba(255,255,255,0.3);" onclick="event.preventDefault(); Swal.fire('Live Chat', 'Our live chat system is currently connecting you to an agent...', 'info');">
                 <i class="fa-solid fa-comments"></i> Start Live Chat
-            </a>
+            </a> -->
         </div>
     </div>
 </div>
@@ -177,5 +188,46 @@ $categories = $categoriesStmt->fetchAll();
 <style>
 /* Remove old card hover since global-glass-container handles it */
 </style>
+
+<script>
+function showReport(doctorName, reportText) {
+    if (!reportText || reportText.trim() === "") {
+        Swal.fire({
+            title: 'Pending',
+            text: 'Doctor has not submitted the report yet.',
+            icon: 'info',
+            confirmButtonColor: '#4F46E5'
+        });
+        return;
+    }
+    
+    Swal.fire({
+        title: '<div style="color: #4338ca !important; font-weight: 800; font-size: 1.5rem; margin-top: 0.5rem;">HealthyHub Medical Report</div>',
+        html: `
+            <div style="text-align: left; padding: 1.5rem; background: #ffffff !important; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 1rem;">
+                <div style="margin-bottom: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.6rem;">
+                    <span style="color: #475569 !important; font-size: 0.85rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; display: block;">Treating Physician</span>
+                    <div style="color: #0f172a !important; font-size: 1.2rem; font-weight: 800; margin-top: 0.2rem;">${doctorName}</div>
+                </div>
+                <div>
+                    <span style="color: #475569 !important; font-size: 0.85rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; display: block;">Report Details / Diagnosis</span>
+                    <div style="color: #1e293b !important; font-size: 1.05rem; line-height: 1.7; margin-top: 0.8rem; white-space: pre-wrap; font-weight: 600; min-height: 100px;">
+                        "${reportText}"
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: center; color: #64748b !important; font-size: 0.85rem; font-weight: 600;">
+                &copy; 2026 HealthyHub Healthcare System
+            </div>
+        `,
+        showCloseButton: true,
+        confirmButtonText: 'Great, Thanks!',
+        confirmButtonColor: '#4F46E5',
+        width: '600px',
+        background: '#ffffff',
+        padding: '2rem'
+    });
+}
+</script>
 
 <?php include '../includes/footer.php'; ?>

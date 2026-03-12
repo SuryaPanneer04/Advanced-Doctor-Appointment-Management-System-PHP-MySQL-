@@ -63,7 +63,8 @@ $appointments = $pdo->query("
                     <th>Date & Time</th>
                     <th>Patient</th>
                     <th>Doctor</th>
-                    <th>Specialization</th>
+                    <th>Query</th>
+                    <th>Report</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -78,7 +79,16 @@ $appointments = $pdo->query("
                             </td>
                             <td><?php echo htmlspecialchars($appt['patient_name']); ?></td>
                             <td><?php echo htmlspecialchars($appt['doctor_name']); ?></td>
-                            <td><?php echo htmlspecialchars($appt['category_name']); ?></td>
+                            <td>
+                                <div style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;" title="<?php echo htmlspecialchars($appt['patient_query']); ?>">
+                                    <?php echo htmlspecialchars($appt['patient_query'] ?: '-'); ?>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;" title="<?php echo htmlspecialchars($appt['doctor_report']); ?>">
+                                    <?php echo htmlspecialchars($appt['doctor_report'] ?: '-'); ?>
+                                </div>
+                            </td>
                             <td>
                                 <?php 
                                     $statusClass = 'badge-pending';

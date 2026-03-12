@@ -68,9 +68,10 @@ foreach ($categories as $catName) {
 
     // Insert into database
     foreach ($categoryDoctors as $doc) {
-        $stmt = $pdo->prepare("INSERT INTO doctors (category_id, name, email, phone, photo, details, rating, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $password = password_hash('doctor123', PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO doctors (category_id, name, email, password, phone, photo, details, rating, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
-            $doc['category_id'], $doc['name'], $doc['email'], $doc['phone'], 
+            $doc['category_id'], $doc['name'], $doc['email'], $password, $doc['phone'], 
             $doc['photo'], $doc['details'], $doc['rating'], $doc['is_available']
         ]);
         echo "  Added Doctor: {$doc['name']} (Rating: {$doc['rating']}, Available: {$doc['is_available']})\n";
