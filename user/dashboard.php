@@ -47,7 +47,8 @@ $categories = $categoriesStmt->fetchAll();
                 <tr>
                     <th>Date & Time</th>
                     <th>Doctor</th>
-                    <th>Specialization</th>
+                    <th>Token #</th>
+                    <th>Queue Status</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -61,7 +62,26 @@ $categories = $categoriesStmt->fetchAll();
                                 <small class="text-gray"><?php echo date('h:i A', strtotime($appt['appointment_time'])); ?></small>
                             </td>
                             <td><?php echo htmlspecialchars($appt['doctor_name']); ?></td>
-                            <td><?php echo htmlspecialchars($appt['category_name']); ?></td>
+                            <td><span class="glass-badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; font-weight: 700;">#<?php echo $appt['token_number']; ?></span></td>
+                            <td>
+                                <?php 
+                                    if ($appt['status'] === 'Approved') {
+                                        // Calculate people ahead
+                                        $aheadStmt = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND token_number < ? AND status = 'Approved' AND doctor_report IS NULL");
+                                        $aheadStmt->execute([$appt['doctor_id'], $appt['appointment_date'], $appt['token_number']]);
+                                        $ahead = $aheadStmt->fetchColumn();
+                                        $waitTime = $ahead * 15; // 15 mins per patient
+                                        
+                                        if ($ahead == 0) {
+                                            echo '<span style="color: #6ee7b7;"><i class="fa-solid fa-person-walking"></i> You are next!</span>';
+                                        } else {
+                                            echo '<span style="color: #fbbf24;"><i class="fa-solid fa-clock"></i> '.$ahead.' ahead (~'.$waitTime.'m)</span>';
+                                        }
+                                    } else {
+                                        echo '<span class="text-gray">Pending Approval</span>';
+                                    }
+                                ?>
+                            </td>
                             <td>
                                 <?php 
                                     $statusClass = 'badge-pending';
@@ -98,7 +118,7 @@ $categories = $categoriesStmt->fetchAll();
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" class="text-center" style="padding: 3rem 1rem;">
+                        <td colspan="6" class="text-center" style="padding: 3rem 1rem;">
                             <p style="color: var(--gray); margin-bottom: 1rem;">You have not booked any appointments yet.</p>
                             <a href="book-appointment.php" class="btn btn-primary">Book Your First Appointment</a>
                         </td>

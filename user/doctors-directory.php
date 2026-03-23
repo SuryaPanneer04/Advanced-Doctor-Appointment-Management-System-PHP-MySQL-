@@ -16,16 +16,21 @@ include '../includes/header.php';
 </div>
 
 <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem;">
-    <!-- Filters Sidebar -->
     <div class="global-glass-container fade-in-up delay-100" style="align-self: start; position: sticky; top: 90px; padding: 2rem; margin-bottom: 0;">
-        <h3 style="margin-bottom: 1.5rem; text-align: left; font-size: 1.2rem; color: white;">Filters & Sorting</h3>
+        <h3 style="margin-bottom: 1.5rem; text-align: left; font-size: 1.2rem; color: white;">Smart Doctor Search</h3>
         
         <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label class="form-label" style="color: rgba(255,255,255,0.9);">Sort By</label>
-            <select id="sort-select" class="form-control glass-input">
-                <option value="rating">Highest Rated</option>
-                <option value="reviews">Most Reviewed</option>
-                <option value="recent">Recently Added</option>
+            <label class="form-label" style="color: rgba(255,255,255,0.9);">Search Name</label>
+            <input type="text" id="search-input" class="form-control glass-input" placeholder="Doctor name...">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="color: rgba(255,255,255,0.9);">Minimum Rating</label>
+            <select id="rating-select" class="form-control glass-input">
+                <option value="0">All Ratings</option>
+                <option value="4.5">4.5+ Stars</option>
+                <option value="4.0">4.0+ Stars</option>
+                <option value="3.0">3.0+ Stars</option>
             </select>
         </div>
 
@@ -41,7 +46,7 @@ include '../includes/header.php';
             </select>
         </div>
 
-        <div class="form-group" style="margin-bottom: 2rem;">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
             <label class="form-label" style="color: rgba(255,255,255,0.9);">Availability</label>
             <select id="availability-select" class="form-control glass-input">
                 <option value="all">All Doctors</option>
@@ -49,8 +54,17 @@ include '../includes/header.php';
                 <option value="unavailable">Not Available</option>
             </select>
         </div>
+
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label class="form-label" style="color: rgba(255,255,255,0.9);">Sort By</label>
+            <select id="sort-select" class="form-control glass-input">
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviewed</option>
+                <option value="recent">Recently Added</option>
+            </select>
+        </div>
         
-        <button id="apply-filters" class="glass-btn" style="width: 100%;">Apply Filters</button>
+        <button id="apply-filters" class="glass-btn" style="width: 100%; background: var(--primary);">Apply Search</button>
     </div>
 
     <!-- Results Area -->
@@ -78,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortSelect = document.getElementById('sort-select');
     const categorySelect = document.getElementById('category-select');
     const availabilitySelect = document.getElementById('availability-select');
+    const searchInput = document.getElementById('search-input');
+    const ratingSelect = document.getElementById('rating-select');
     
     const grid = document.getElementById('doctors-grid');
     const loader = document.getElementById('results-loader');
@@ -91,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams({
             sort: sortSelect.value,
             category_id: categorySelect.value,
-            availability: availabilitySelect.value
+            availability: availabilitySelect.value,
+            search: searchInput.value,
+            rating_min: ratingSelect.value
         });
 
         try {
@@ -116,18 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
         doctors.forEach(doc => {
             const isAvail = (doc.is_available == 1 || doc.is_available == '1');
             const rating = parseFloat(doc.rating);
-            const isTopTier = (rating >= 4.8);
             const isHighRated = (rating >= 4.5);
             
             let starsHtml = '';
-            const starColor = isHighRated ? '#fbbf24' : 'rgba(255,255,255,0.6)';
             for(let i=1; i<=5; i++) {
                 if (i <= Math.floor(rating)) {
-                    starsHtml += `<i class="fa-solid fa-star" style="color: ${starColor};"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star" style="color: #fbbf24;"></i>`;
                 } else if (i - 0.5 <= rating) {
-                    starsHtml += `<i class="fa-solid fa-star-half-stroke" style="color: ${starColor};"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star-half-stroke" style="color: #fbbf24;"></i>`;
                 } else {
-                    starsHtml += `<i class="fa-regular fa-star" style="color: ${starColor};"></i>`;
+                    starsHtml += `<i class="fa-regular fa-star" style="color: rgba(255,255,255,0.3);"></i>`;
                 }
             }
 
@@ -140,57 +156,38 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.height = '100%';
             card.style.position = 'relative';
             if (!isAvail) card.style.opacity = '0.7';
-            if (isHighRated) {
-                card.style.border = '1px solid rgba(251, 191, 36, 0.4)';
-                card.style.boxShadow = '0 0 20px rgba(251, 191, 36, 0.15)';
-            }
-
-            let badgeHtml = '';
-            if (isTopTier) {
-                badgeHtml = `
-                    <div style="position: absolute; top: -10px; right: -10px; z-index: 10;">
-                        <span class="glass-badge" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000; font-weight: 700; border: none; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
-                            <i class="fa-solid fa-crown"></i> Top-Tier Expert
-                        </span>
-                    </div>
-                `;
-            }
 
             const statusBadge = isAvail 
-                ? `<span class="glass-badge" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; padding: 0.3rem 0.8rem; font-size: 0.8rem;"><i class="fa-solid fa-circle-check"></i> Available Now</span>`
-                : `<span class="glass-badge" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.3rem 0.8rem; font-size: 0.8rem;"><i class="fa-solid fa-circle-xmark"></i> Fully Booked</span>`;
+                ? `<span class="glass-badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;"><i class="fa-solid fa-circle-check"></i> Available</span>`
+                : `<span class="glass-badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;"><i class="fa-solid fa-circle-xmark"></i> Full</span>`;
 
             card.innerHTML = `
-                ${badgeHtml}
                 <div style="display: flex; gap: 1rem; align-items: start; margin-bottom: 1rem; flex-grow: 1;">
-                    <img src="${photoUrl}" alt="${doc.name}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid ${isHighRated ? 'rgba(251, 191, 36, 0.5)' : 'rgba(255,255,255,0.3)'};">
+                    <img src="${photoUrl}" alt="${doc.name}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);">
                     <div>
                         <h4 style="margin: 0 0 0.4rem 0; color: white; font-size: 1.1rem;">${doc.name}</h4>
-                        <span class="glass-badge" style="background: rgba(79, 70, 229, 0.4); border-color: rgba(79, 70, 229, 0.6); margin-bottom: 0.5rem; display: inline-block;">${doc.category_name}</span>
-                        <div style="font-size: 0.9rem; margin-top: 0.3rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <span class="glass-badge" style="background: rgba(79, 70, 229, 0.4); margin-bottom: 0.5rem; display: inline-block;">${doc.category_name}</span>
+                        <div style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
                             <span class="review-stars" style="margin: 0;">${starsHtml}</span>
-                            <span style="font-size: 0.81rem; color: white; font-weight: 600;">
-                                ${rating.toFixed(1)}
-                            </span>
-                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">( ${doc.review_count} Reviews )</span>
+                            <span style="font-size: 0.81rem; color: white; font-weight: 600;">${rating.toFixed(1)}</span>
+                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">( ${doc.review_count} )</span>
                         </div>
-                        <p style="margin: 0.8rem 0 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            ${doc.details || 'Dedicated professional medical practitioner.'}
-                        </p>
                     </div>
                 </div>
-                <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 0.8rem;">
-                    <button onclick="viewReviews(${doc.id})" class="glass-btn" style="width: 100%; margin: 0; font-size: 0.8rem; padding: 0.4rem; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-                        <i class="fa-solid fa-comments"></i> View Reviews
-                    </button>
+                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 0.8rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                         <span style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">Status:</span>
+                         <span style="font-size: 0.9rem; color: #6ee7b7; font-weight: 700;">₹${doc.fees}</span>
                          ${statusBadge}
                     </div>
-                    ${isAvail 
-                        ? `<a href="book-appointment.php?category_id=${doc.category_id}&doctor_id=${doc.id}" class="glass-btn" style="width: 100%; margin: 0; text-align: center; background: ${isHighRated ? 'rgba(251, 191, 36, 0.15)' : ''}; border-color: ${isHighRated ? 'rgba(251, 191, 36, 0.4)' : ''}; font-weight: 600;">Book Appointment</a>`
-                        : `<button class="glass-btn" disabled style="width: 100%; margin: 0; opacity: 0.5; cursor: not-allowed;">Not Available</button>`
-                    }
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <button onclick="viewReviews(${doc.id})" class="glass-btn" style="width: 100%; margin: 0; font-size: 0.8rem; padding: 0.4rem;">
+                            Reviews
+                        </button>
+                        ${isAvail 
+                            ? `<a href="book-appointment.php?category_id=${doc.category_id}&doctor_id=${doc.id}" class="glass-btn btn-primary" style="width: 100%; margin: 0; text-align: center; font-size: 0.8rem; padding: 0.4rem; color: white !important;">Book</a>`
+                            : `<button class="glass-btn" disabled style="width: 100%; margin: 0; opacity: 0.5; cursor: not-allowed; font-size: 0.8rem; padding: 0.4rem;">Full</button>`
+                        }
+                    </div>
                 </div>
             `;
             grid.appendChild(card);

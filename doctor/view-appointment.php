@@ -58,6 +58,11 @@ include '../includes/header.php';
         </h3>
         
         <div style="margin-bottom: 1rem;">
+            <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block;">Queue Status</label>
+            <div style="color: #fbbf24; font-size: 1.1rem; font-weight: 800;">Token #<?php echo $app['token_number']; ?></div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
             <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block;">Full Name</label>
             <div style="color: white; font-size: 1.1rem; font-weight: 600;"><?php echo htmlspecialchars($app['patient_name']); ?></div>
         </div>
@@ -69,8 +74,14 @@ include '../includes/header.php';
         </div>
 
         <div style="margin-bottom: 1rem;">
-            <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block;">Address</label>
-            <div style="color: white;"><?php echo htmlspecialchars($app['patient_address'] ?: 'Not provided'); ?></div>
+            <label style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block;">Medical History / Report</label>
+            <?php if ($app['medical_report']): ?>
+                <a href="../<?php echo $app['medical_report']; ?>" target="_blank" class="glass-btn" style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(79, 70, 229, 0.2); border-color: rgba(79, 70, 229, 0.4); color: #818cf8;">
+                    <i class="fa-solid fa-file-medical"></i> View Uploaded Report
+                </a>
+            <?php else: ?>
+                <div style="color: rgba(255,255,255,0.4); font-style: italic; font-size: 0.9rem; margin-top: 0.3rem;">No reports uploaded.</div>
+            <?php endif; ?>
         </div>
 
         <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #6ee7b7;">

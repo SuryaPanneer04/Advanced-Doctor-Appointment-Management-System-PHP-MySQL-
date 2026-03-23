@@ -110,12 +110,15 @@ $topReviews = $reviewsStmt->fetchAll();
                 <div class="pro-card" style="padding: 2rem;">
                     <i class="fa-solid fa-quote-right" style="position: absolute; right: 2rem; top: 2rem; font-size: 3rem; color: #f1f5f9; z-index: 0;"></i>
                     <div style="position: relative; z-index: 1;">
-                        <div class="review-stars">
-                            <?php 
-                            for($i=1; $i<=5; $i++) {
-                                echo ($i <= $rev['rating']) ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
-                            }
-                            ?>
+                        <div class="review-stars" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.2rem;">
+                                <?php 
+                                for($i=1; $i<=5; $i++) {
+                                    echo ($i <= $rev['rating']) ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                                }
+                                ?>
+                            </div>
+                            <span style="font-weight: 700; color: var(--dark); font-size: 0.9rem;"><?php echo number_format($rev['rating'], 1); ?></span>
                         </div>
                         <p style="color: var(--dark); font-size: 1.05rem; font-style: italic; margin-bottom: 1.5rem; line-height: 1.6;">
                             "<?php echo htmlspecialchars($rev['comment'] ?: 'Excellent experience. Highly recommended!'); ?>"

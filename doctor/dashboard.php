@@ -42,12 +42,55 @@ $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $appointments = $stmt->fetchAll();
 
+// Get Statistics
+$statsStmt = $pdo->prepare("
+    SELECT 
+        COUNT(*) as total_appointments,
+        SUM(CASE WHEN appointment_date = CURDATE() THEN 1 ELSE 0 END) as appointments_today,
+        SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) as approved_appointments,
+        SUM(d.fees) as total_revenue
+    FROM appointments a
+    JOIN doctors d ON a.doctor_id = d.id
+    WHERE a.doctor_id = ?
+");
+$statsStmt->execute([$doctor_id]);
+$stats = $statsStmt->fetch();
+
 include '../includes/header.php';
 ?>
 
+<!-- Analytics Section -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;" class="fade-in-up">
+    <div class="pro-card" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
+        <h4 style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Appointments</h4>
+        <div style="font-size: 1.8rem; font-weight: 700; color: white;"><?php echo $stats['total_appointments']; ?></div>
+        <div style="font-size: 0.8rem; color: #6ee7b7; margin-top: 0.4rem;"><i class="fa-solid fa-check-circle"></i> <?php echo $stats['approved_appointments']; ?> Approved</div>
+    </div>
+    <div class="pro-card" style="padding: 1.5rem; border-left: 4px solid #6ee7b7;">
+        <h4 style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">Appointments Today</h4>
+        <div style="font-size: 1.8rem; font-weight: 700; color: white;"><?php echo $stats['appointments_today']; ?></div>
+        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.4rem;">Live scheduled slots</div>
+    </div>
+    <div class="pro-card" style="padding: 1.5rem; border-left: 4px solid #fbbf24;">
+        <h4 style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Revenue</h4>
+        <div style="font-size: 1.8rem; font-weight: 700; color: white;">₹<?php echo number_format($stats['total_revenue'] ?? 0, 2); ?></div>
+        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.4rem;">Based on consultation fees</div>
+    </div>
+    <div class="pro-card" style="padding: 1.5rem; border-left: 4px solid #fca5a5;">
+        <h4 style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">Completion Rate</h4>
+        <div style="font-size: 1.8rem; font-weight: 700; color: white;">
+            <?php 
+                $rate = $stats['total_appointments'] > 0 ? ($stats['approved_appointments'] / $stats['total_appointments']) * 100 : 0;
+                echo round($rate) . '%';
+            ?>
+        </div>
+        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.4rem;">Approved vs Total</div>
+    </div>
+</div>
+
 <div class="dashboard-header" style="margin-bottom: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-        <h2 style="color: white; margin: 0;"><i class="fa-solid fa-calendar-days"></i> Patient Appointments</h2>
+        <h2 style="color: white; margin: 0;"><i class="fa-solid fa-calendar-check"></i> Patient Management</h2>
         
         <div class="stats-badges" style="display: flex; gap: 1rem;">
             <?php
@@ -92,24 +135,27 @@ include '../includes/header.php';
     <table class="glass-table">
         <thead>
                 <tr>
+                <tr>
+                    <th>Token #</th>
                     <th>Patient Name</th>
                     <th>Date & Time</th>
                     <th>Patient Query</th>
-                    <th>Medical Status</th>
+                    <th>Medical Report</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($appointments)): ?>
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">No appointments found.</td>
+                        <td colspan="8" style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">No appointments found.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($appointments as $app): ?>
                         <tr>
+                            <td><div class="glass-badge" style="background: rgba(255,255,255,0.1); font-weight: 700; width: 40px; text-align: center; color: #fbbf24;">#<?php echo $app['token_number']; ?></div></td>
                             <td>
                                 <strong style="color: white;"><?php echo htmlspecialchars($app['patient_name']); ?></strong><br>
-                                <small style="color: rgba(255,255,255,0.6);"><i class="fa-solid fa-envelope"></i> <?php echo htmlspecialchars($app['patient_email']); ?></small><br>
                                 <small style="color: rgba(255,255,255,0.6);"><i class="fa-solid fa-phone"></i> <?php echo htmlspecialchars($app['patient_phone']); ?></small>
                             </td>
                             <td>
@@ -117,28 +163,29 @@ include '../includes/header.php';
                                 <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);"><?php echo date('h:i A', strtotime($app['appointment_time'])); ?></div>
                             </td>
                             <td>
-                                <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.8);">
-                                    <?php echo htmlspecialchars($app['patient_query'] ?: 'No query provided'); ?>
+                                <div style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.8);" title="<?php echo htmlspecialchars($app['patient_query']); ?>">
+                                    <?php echo htmlspecialchars($app['patient_query'] ?: 'None'); ?>
                                 </div>
                             </td>
                             <td>
-                                <?php if (!empty($app['doctor_report'])): ?>
-                                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">
-                                        <i class="fa-solid fa-circle-check"></i> Analysis Done
-                                    </span>
+                                <?php if ($app['medical_report']): ?>
+                                    <a href="../<?php echo $app['medical_report']; ?>" target="_blank" class="glass-btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; background: rgba(79, 70, 229, 0.2); color: #818cf8; border-color: rgba(79, 70, 229, 0.4);">
+                                        <i class="fa-solid fa-file-medical"></i> View Report
+                                    </a>
                                 <?php else: ?>
-                                    <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
-                                        <i class="fa-solid fa-clock"></i> Report Pending
-                                    </span>
+                                    <span style="color: rgba(255,255,255,0.3); font-size: 0.85rem;">No file</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if (!empty($app['doctor_report'])): ?>
+                                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">Done</span>
+                                <?php else: ?>
+                                    <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">Pending</span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <a href="view-appointment.php?id=<?php echo $app['id']; ?>" class="glass-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <?php if (!empty($app['doctor_report'])): ?>
-                                        <i class="fa-solid fa-edit"></i> Edit Report
-                                    <?php else: ?>
-                                        <i class="fa-solid fa-plus"></i> Add Report
-                                    <?php endif; ?>
+                                    <i class="fa-solid fa-notes-medical"></i> <?php echo !empty($app['doctor_report']) ? 'Edit' : 'Treat'; ?>
                                 </a>
                             </td>
                         </tr>
